@@ -15,8 +15,8 @@
 
 | 対象 | 頻度 | 先 | 方式 |
 |---|---|---|---|
-| Postgres | 毎時 WAL + 毎晩フル | NAS → オフサイト | pgBackRest |
-| オブジェクト(原本) | 毎晩 | NAS(RAID)+ オフサイト | rclone(暗号化) |
+| Postgres | 毎時 WAL + 毎晩フル | NAS → クラウド(暗号化, D-027) | pgBackRest + rclone crypt |
+| オブジェクト(原本) | 毎晩 | NAS(RAID)+ クラウド(暗号化, D-027) | rclone crypt → Backblaze B2 / Cloudflare R2 等。鍵はオーナーのみ保持 |
 | 設定・IaC | 変更時 | Git(このリポジトリ) | Ansible/compose を宣言的に |
 | モデル | なし(再取得可) | NAS に倉庫 | ハッシュ台帳のみ保持 |
 | macOS ノード | 週次 | NAS | Time Machine(システム部分のみ) |

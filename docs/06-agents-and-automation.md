@@ -37,7 +37,7 @@
 | Morning Brief | 毎朝 | 天気・予定・ニュース要約・家の状態・昨夜のバックグラウンド成果を音声+Discord で |
 | Inbox Triage | メール受信 | 分類・要約・返信下書き(送信は承認) |
 | Repo Guardian | GitHub イベント | Issue 要約、PR レビュー、CI 失敗の原因推定と修正案 |
-| Home Steward | センサー | 不在時の消し忘れ検知、帰宅前の空調、異常通知 |
+| Home Steward | センサー | (保留: D-026) 不在時の消し忘れ検知、帰宅前の空調、異常通知 |
 | Media Librarian | ファイル追加 | 写真の顔/物体タグ付け、動画の文字起こし・章立て、重複整理 |
 | Research Scout | 毎晩 | Interests に関する新着論文・記事を収集し Topic Wiki を更新 |
 | Model Scout | 毎週 | 新モデルを Lab で評価し、Tier 昇格を提案 |
