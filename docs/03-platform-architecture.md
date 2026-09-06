@@ -66,7 +66,7 @@
 |---|---|---|
 | Web UI | Open WebUI or LibreChat | チャット・ファイル・画像 |
 | チャットアプリ | **Discord Bot**(D-016)。専用サーバーにチャンネル分け(会話/通知/承認/アラート/ログ) | どこからでも指示・通知・承認。LINE/Telegram は将来の通知専用 |
-| 音声 | Home Assistant Assist + ローカル STT/TTS + スマートスピーカー | 家の中はハンズフリー |
+| 音声 | Home Assistant Voice PE(各部屋)+ HA Assist + Sense ノードの STT/TTS(D-020, 07.5) | 家の中はハンズフリー |
 | モバイル | Tailscale 経由で Web UI / PWA | |
 | CLI/IDE | OpenAI 互換 API を Claude Code / Cursor / Continue 等から | |
 

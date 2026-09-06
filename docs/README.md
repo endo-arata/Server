@@ -15,9 +15,9 @@
 | 02 | [02-hardware-and-network.md](02-hardware-and-network.md) | 4台の物理構成・Thunderbolt 5 メッシュ・RDMA・LAN・電源 | v0.2 |
 | 03 | [03-platform-architecture.md](03-platform-architecture.md) | 5プレーン構成(制御/推論/データ/エージェント/インターフェース) | v0.1 |
 | 04 | [04-inference-and-models.md](04-inference-and-models.md) | クラスタ運用モード・モデル階層・ルーティング | v0.1 |
-| 05 | [05-knowledge-and-rag.md](05-knowledge-and-rag.md) | 「データが無い」前提の自律的ナレッジ構築とRAG | v0.1 |
+| 05 | [05-knowledge-and-rag.md](05-knowledge-and-rag.md) | 「データが無い」前提の自律的ナレッジ構築とRAG・初期 Topic Wiki | v0.2 |
 | 06 | [06-agents-and-automation.md](06-agents-and-automation.md) | エージェント実行基盤・自律オートメーション | v0.1 |
-| 07 | [07-life-integrations.md](07-life-integrations.md) | 生活を豊かにする連携カタログ(提案) | v0.1 |
+| 07 | [07-life-integrations.md](07-life-integrations.md) | 生活連携カタログ・スマートホーム構築計画・音声設計 | v0.2 |
 | 08 | [08-security-and-remote-access.md](08-security-and-remote-access.md) | VPN・認証・秘密管理・ゼロトラスト | v0.1 |
 | 09 | [09-operations.md](09-operations.md) | 監視・バックアップ・更新・障害対応 | v0.1 |
 | 10 | [10-roadmap.md](10-roadmap.md) | フェーズ分割と受け入れ基準 | v0.1 |

@@ -52,6 +52,62 @@ D-012: オーナーは「生活が豊かになるもの全て」を提案して�
 | 目標コーチ | 目標・習慣を登録し、進捗を追跡、リマインドと軌道修正の提案 |
 | 学習計画 | 学びたいテーマから教材探索・カリキュラム生成・クイズ |
 
+## 7.4 スマートホーム構築計画(D-018: ゼロから揃える)
+
+### 方針
+- **ローカル制御優先**: クラウド必須の機器は避ける。Matter over Thread / Zigbee / ローカル API(Wi-Fi)の順で選ぶ
+- **Home Assistant(HA)が唯一の司令塔**。Alexa/Google Home は入れない(音声はローカル端末で置き換える)
+- 全機器は `iot` VLAN に隔離し、HA からのみ到達可能にする
+
+### ハブ・基盤
+
+| 要素 | 候補 | 備考 |
+|---|---|---|
+| HA 本体 | `studio-a` 上のコンテナ(HA Container)or 専用 Home Assistant Green/Yellow | Mac 上でも動くが、USB ドングル運用と可用性を考え**専用小型機を推奨**(→OQ-019) |
+| Zigbee | SONOFF ZBDongle-E / SkyConnect(Zigbee2MQTT) | 安価なセンサー類はほぼ Zigbee |
+| Thread/Matter | HA SkyConnect(Thread ボーダールーター)or Apple TV/HomePod 経由 | 新規機器は Matter 優先 |
+| MQTT | Mosquitto(コンテナ) | センサーとエージェント間のイベントバス |
+
+### 第1期で揃える機器(提案)
+
+| カテゴリ | 例 | 目的 |
+|---|---|---|
+| 照明 | Matter/Zigbee 対応 LED 電球・スイッチ(各部屋) | 音声・在宅状況での自動制御 |
+| 環境センサー | 温湿度・CO2・照度・人感(Zigbee, 各部屋) | 快適性・在不在・自動換気 |
+| ドア/窓センサー | Zigbee 開閉センサー | 防犯・消し忘れ |
+| スマートプラグ(電力計測付き) | Matter/Zigbee | Mac 4台・NAS の電力可視化、待機電力削減 |
+| エアコン | 赤外線ブリッジ(SwitchBot Hub 等の**ローカル API**モード)or Matter 対応機 | 帰宅前の空調 |
+| カメラ | PoE カメラ(RTSP)+ Frigate | 7.2 のカメラ AI |
+| スマートロック | Matter 対応(SwitchBot Lock 等) | 施錠確認・解錠は Approve |
+| 音声端末 | 7.5 参照 | |
+
+第2期候補: カーテン、ロボット掃除機(ローカル連携可能な機種)、玄関インターホン、給湯・浴室、給餌器(ペットがいれば)
+
+## 7.5 音声インターフェース(D-020: 専用スピーカーを各部屋に)
+
+```
+[音声端末] ─ウェイクワード検出(端末内)─▶ 音声ストリーム ─▶ HA Assist
+      ▲                                              │
+      │                                    STT (Sense: Whisper / 日本語最適化)
+      │                                              ▼
+      │                                    会話エージェント(Concierge ← Router)
+      │                                              ▼
+      └──────── TTS 音声(Sense: Kokoro/CosyVoice 日本語) ◀──┘
+```
+
+| 要素 | 候補 | 備考 |
+|---|---|---|
+| 端末 | Home Assistant Voice Preview Edition(各部屋 1 台) | ローカル前提の公式端末。マイクアレイ・ウェイクワード内蔵 |
+| 代替端末 | ESP32-S3 ベース自作(ESPHome)/ 旧 iPad をキオスク化 | 大画面が欲しい部屋向け |
+| ウェイクワード | microWakeWord(端末内)。独自ワードも学習可 | 「OK ○○」を決める(→OQ-020) |
+| STT | mlx-whisper large-v3-turbo(日本語)/ 高速用に ReazonSpeech 系を Lab で評価 | 目標: 発話終了から 300ms 以内で文字化 |
+| TTS | Kokoro(軽量)/ CosyVoice・Fish-Speech(高品質日本語) | 目標: 最初の音声まで 500ms 以内 |
+| 会話 | HA Assist の conversation agent を Router 経由のローカル LLM に設定 | 家電操作は HA の intent、雑談・質問は LLM |
+| 音楽・放送 | Music Assistant(HA 連携)で各部屋へ Morning Brief を配信 | 端末のスピーカー品質が低ければ外部スピーカー接続 |
+
+レイテンシ目標(体感で「会話」になる線): ウェイクワード〜応答開始 **1.5 秒以内**。
+Titan は音声応答には使わず、Fast(T2)固定。難問は「後で Discord に詳しく送る」と応答して非同期化する。
+
 ## 7.3 導入順序の考え方
 
 1. **入口**(Discord + Web UI + 音声)を最初に。これが無いと他が使えない
