@@ -72,15 +72,15 @@
 
 ## 3.3 ノード配置の要約
 
-| プレーン | studio-a (Core) | studio-b (Fast) | studio-c (Sense) | studio-d (Lab) |
-|---|---|---|---|---|
-| Control | ● 全部 | エージェント | エージェント | エージェント |
-| Inference | Titan #0, Embed | Titan #1, Fast | Titan #2, Sense | Titan #3, 実験 |
-| Data | ● Postgres 等 | — | — | — |
-| Agent | ● ランタイム・n8n | サンドボックス | サンドボックス | サンドボックス |
-| Interface | ● Gateway・UI・Bot | — | — | — |
+| プレーン | edge (常時) | studio-a (Core) | studio-b (Fast) | studio-c (Sense) | studio-d (Lab) |
+|---|---|---|---|---|---|
+| Control | FW・DNS・VPN・稼働監視 | ● 残り全部 | エージェント | エージェント | エージェント |
+| Inference | — | Titan #0, Embed | Titan #1, Fast | Titan #2, Sense | Titan #3, 実験 |
+| Data | HA の状態 DB・録画 | ● Postgres 等 | — | — | — |
+| Agent | HA オートメーション(ルール型) | ● ランタイム・n8n | サンドボックス | サンドボックス | サンドボックス |
+| Interface | HA UI・音声端末の受け口 | ● Gateway・UI・Bot | — | — | — |
 
-> Core が単一障害点になるのは意図的。個人利用では「復旧手順が明確な単一点」の方が
+> 「家が動く」責務は `edge` に、「AI が賢い」責務は Mac 群に分ける。Mac 側の Core が単一障害点になるのは意図的。個人利用では「復旧手順が明確な単一点」の方が
 > 分散合意(etcd 等)より運用が楽。Core の SSD/DB は毎晩 NAS へスナップショット。
 
 ## 3.4 内部 API 契約(方針)

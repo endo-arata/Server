@@ -9,7 +9,9 @@
 | `studio-c` | 同上 | **Sense**: マルチモーダル(画像/音声/動画/OCR/埋め込み) + クラスタシャード #2 | |
 | `studio-d` | 同上 | **Lab**: 実験・ファインチューニング・新モデル評価 + クラスタシャード #3 | 壊しても良い枠。クラスタ縮退時は最初に切り離す |
 
-> 4台とも同一スペックなので役割は論理的なもの。役割は設定で入替可能にする。
+| `edge` | 小型 Linux サーバー(新規、D-022) | **Edge**: ルーター/FW、Home Assistant、カメラ AI、DNS、Tailscale Subnet Router | Mac 群が全停止しても「家」は動く常時稼働基盤 |
+
+> Mac 4台は同一スペックなので役割は論理的なもの。役割は設定で入替可能にする。`edge` だけは物理的に別の役割。
 
 ### メモリ予算(1ノードあたり 512GB)
 
@@ -55,20 +57,22 @@ TB5 メッシュは推論の集合通信専用にし、通常のトラフィッ�
 回線は **NURO光 10Gbps**(D-014)。NURO の ONU 一体型ルーター(10GbE ポート付き)が WAN 側の起点になる。
 
 ```
-[NURO ONU/ルーター] ─10GbE─ [自前ルーター/FW (VLAN・DNS・Tailscale Subnet Router)]
-                                   │
+[NURO ONU/ルーター] ─10GbE─ [edge: Proxmox → OPNsense (VLAN・FW・DNS・VPN) / HAOS / Frigate]
+                                   │ 10GbE
                             [10GbE マネージドスイッチ]
-                    ┌──────┬──────┼──────┬──────┬──────┐
-                studio-a studio-b studio-c studio-d  NAS   Wi-Fi AP(クライアント/IoT)
+                    ┌──────┬──────┼──────┬──────┬──────┬──────┐
+                studio-a studio-b studio-c studio-d  NAS   PoE SW  Wi-Fi AP ×1〜2
+                                                        (カメラ・音声端末)
 ```
 
 | 項目 | 提案 | 備考 |
 |---|---|---|
 | WAN | NURO ONU をブリッジ相当(or DMZ)にして自前ルーターに全部渡す | NURO 機器は VLAN/細かい FW が組めないため二重ルーターを避ける(→OQ-004: 機種確認) |
-| ルーター/FW | UniFi Cloud Gateway 系 / MikroTik / OPNsense(Mini PC) のいずれか | VLAN 間 FW、内部 DNS、DHCP、IDS。Tailscale Subnet Router は `studio-a` でも代替可 |
+| ルーター/FW | `edge` 上の OPNsense(D-022, 2.7 参照) | VLAN 間 FW、内部 DNS、DHCP、IDS。Tailscale Subnet Router も `edge` |
 | ノード NIC | 内蔵 10GbE × 4台 | Mac Studio 標準 |
 | スイッチ | 10GbE 8ポート以上(マネージド、SFP+/RJ45) | VLAN: `srv`(4台+NAS) / `client`(PC・スマホ) / `iot`(家電・カメラ) / `guest` |
-| Wi-Fi | Wi-Fi 6E/7 AP を VLAN 対応で | IoT は 2.4GHz 隔離 SSID |
+| Wi-Fi | Wi-Fi 6E/7 AP × 1〜2(3〜4 部屋: D-023)を VLAN 対応で | IoT は 2.4GHz 隔離 SSID |
+| PoE | 8 ポート PoE+ スイッチ(2.5GbE 可) | カメラ・音声端末・AP に給電 |
 | 名前解決 | 自前ルーター or `studio-a` の内部 DNS(`*.home.arpa`) | Tailscale MagicDNS と併用 |
 | 帯域の使い分け | TB5 メッシュ = 推論集合通信 / 10GbE = モデル配布・DB・バックアップ・UI | 10GbE で 600GB 配布は約 10 分 |
 
@@ -106,6 +110,21 @@ Titan 世代を複数保持しても内蔵で十分。NAS の役割は「倉庫�
 - UPS: 1500VA クラス以上を推奨。停電時に Core を安全にシャットダウンし、NAS も保護
 - 熱: Mac Studio は静音だが4台密集は避け、前面吸気/背面排気を確保
 - 物理: 専用ラック棚 or デスクサイド。ケーブル長を短くするため 2×2 配置
+
+## 2.7 `edge` ノード仕様(提案)
+
+| 項目 | 提案 | 備考 |
+|---|---|---|
+| 筐体 | ファンレス or 静音 Mini PC(Intel N305/N355 or Ryzen 7000U 級)、**10GbE × 2 以上**(SFP+ or RJ45)+ 2.5GbE 数ポート | NURO 10G を活かすため WAN/LAN とも 10GbE 必須 |
+| メモリ/SSD | 32〜64GB / NVMe 1〜2TB | Frigate の録画は別途 HDD/NAS |
+| ハイパーバイザ | Proxmox VE | VM/LXC でルーターと HA を分離 |
+| VM1: ルーター/FW | OPNsense(NIC を PCI パススルー) | VLAN、FW、DHCP、Unbound DNS、WireGuard(Tailscale 代替)、IDS(Suricata) |
+| VM2: Home Assistant | Home Assistant OS | Zigbee/Thread ドングルを USB パススルー |
+| LXC/VM3: 周辺 | Frigate(カメラ)、Mosquitto、Music Assistant、Tailscale Subnet Router、Uptime Kuma | GPU 無しでも Frigate は CPU/OpenVINO で可(Coral TPU 追加可) |
+| 電源 | UPS 配下 | 停電時も FW/HA は最後まで生かす |
+| 予算目安 | 8〜15 万円(本体)+ ドングル類 1 万円 | |
+
+> なぜ Mac 上に置かないか: (1) macOS の再起動・OS 更新で家が止まる、(2) NIC パススルーや USB ドングル運用が macOS では困難、(3) 24/365 の常時稼働基盤と実験基盤を物理的に分けるのが安全。
 
 ## 2.6 OS / コンテナランタイム提案
 
