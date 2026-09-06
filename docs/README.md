@@ -1,6 +1,6 @@
 # AI Home Server 計画書 (Project "Studio Quad")
 
-4台の Mac Studio (M3 Ultra / 512GB Unified Memory / 2TB SSD) を核に、
+4台の Mac Studio (M3 Ultra / 512GB Unified Memory / 8TB SSD) を核に、
 ローカルLLM中心で「AIをふんだんに搭載した個人用サーバー基盤」を構築するための計画書群。
 
 本プロジェクトは **計画フェーズを最重視** する。実装に着手する前に、ここにある文書を
@@ -12,7 +12,7 @@
 |---|---|---|---|
 | 00 | [00-decision-log.md](00-decision-log.md) | これまでの決定事項(Q&Aの記録) | 更新中 |
 | 01 | [01-vision-and-principles.md](01-vision-and-principles.md) | ビジョン・設計原則・非目標 | v0.1 |
-| 02 | [02-hardware-and-network.md](02-hardware-and-network.md) | 4台の物理構成・Thunderbolt 5 メッシュ・RDMA・LAN・電源 | v0.1 |
+| 02 | [02-hardware-and-network.md](02-hardware-and-network.md) | 4台の物理構成・Thunderbolt 5 メッシュ・RDMA・LAN・電源 | v0.2 |
 | 03 | [03-platform-architecture.md](03-platform-architecture.md) | 5プレーン構成(制御/推論/データ/エージェント/インターフェース) | v0.1 |
 | 04 | [04-inference-and-models.md](04-inference-and-models.md) | クラスタ運用モード・モデル階層・ルーティング | v0.1 |
 | 05 | [05-knowledge-and-rag.md](05-knowledge-and-rag.md) | 「データが無い」前提の自律的ナレッジ構築とRAG | v0.1 |
